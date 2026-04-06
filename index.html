@@ -328,16 +328,15 @@
       return Promise.resolve();
     }
 
-    function handleEmergency(msgText) {
+    function sendWhatsApp(msgText, location) {
       const target = get('phone_1');
       if (!target) return;
-      const encoded = encodeURIComponent(msgText);
+      const full = location
+        ? msgText + '\n📍 https://maps.google.com/?q=' + location
+        : msgText;
+      const encoded = encodeURIComponent(full);
       if (isLink(target)) {
-        // open WhatsApp with text pre-filled; user just taps the group
-        window.open(
-          'https://api.whatsapp.com/send?text=' + encoded,
-          '_blank'
-        );
+        window.open('https://api.whatsapp.com/send?text=' + encoded, '_blank');
         showToast('בחר את הקבוצה ושלח');
       } else {
         window.open(
@@ -346,6 +345,29 @@
         );
         showToast('ווטסאפ נפתח — שלח את ההודעה');
       }
+    }
+
+    function handleEmergency(msgText) {
+      const target = get('phone_1');
+      if (!target) return;
+
+      if (!navigator.geolocation) {
+        sendWhatsApp(msgText, null);
+        return;
+      }
+
+      showToast('מאתר מיקום…');
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          const loc = pos.coords.latitude.toFixed(6) + ',' + pos.coords.longitude.toFixed(6);
+          sendWhatsApp(msgText, loc);
+        },
+        () => {
+          // permission denied or timeout — send without location
+          sendWhatsApp(msgText, null);
+        },
+        { timeout: 8000, maximumAge: 30000 }
+      );
     }
 
     // ── Setup screen ──────────────────────────────────────────────────
