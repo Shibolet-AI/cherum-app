@@ -10,11 +10,7 @@
   <link rel="manifest" href="manifest.json">
   <title>חירום 🆘</title>
   <style>
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     html, body {
       height: 100%;
@@ -22,7 +18,6 @@
       color: #fff;
       direction: rtl;
       font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
-      /* overflow: hidden removed — blocks iOS long-press paste menu */
     }
 
     /* ── Screens ── */
@@ -38,21 +33,15 @@
     }
     .screen.active { display: flex; flex-direction: column; }
 
-    /* ── Setup & Settings shared styles ── */
     .form-screen {
       justify-content: flex-start;
       overflow-y: auto;
-      gap: 20px;
+      gap: 18px;
       padding-top: max(env(safe-area-inset-top, 12px), 24px);
       padding-bottom: max(env(safe-area-inset-bottom, 12px), 24px);
     }
 
-    .form-screen h1 {
-      font-size: 22px;
-      font-weight: 700;
-      color: #fff;
-      line-height: 1.4;
-    }
+    .form-screen h1 { font-size: 22px; font-weight: 700; line-height: 1.4; }
 
     .instruction {
       font-size: 15px;
@@ -62,25 +51,17 @@
       border-radius: 10px;
       padding: 14px 16px;
     }
+    .instruction strong { color: #ddd; }
 
-    .instruction strong {
-      color: #ddd;
-    }
+    label { display: block; font-size: 14px; color: #aaa; margin-bottom: 6px; }
 
-    label {
-      display: block;
-      font-size: 14px;
-      color: #aaa;
-      margin-bottom: 6px;
-    }
-
-    input[type="text"], input[type="text"] {
+    input[type="text"] {
       width: 100%;
       background: #111;
       border: 1px solid #333;
       border-radius: 10px;
       color: #fff;
-      font-size: 16px;
+      font-size: 18px;
       padding: 14px 16px;
       direction: ltr;
       text-align: left;
@@ -90,46 +71,11 @@
       user-select: text;
       -webkit-user-select: text;
     }
-    input[type="text"]:focus, input[type="text"]:focus {
-      border-color: #555;
-    }
+    input[type="text"]:focus { border-color: #555; }
 
-    .input-row {
-      display: flex;
-      gap: 8px;
-      align-items: stretch;
-    }
-    .input-row input {
-      flex: 1;
-      min-width: 0;
-    }
-    .btn-paste {
-      background: #222;
-      color: #fff;
-      border: 1px solid #444;
-      border-radius: 10px;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 0 14px;
-      cursor: pointer;
-      white-space: nowrap;
-      -webkit-tap-highlight-color: transparent;
-      flex-shrink: 0;
-    }
-    .btn-paste:active { opacity: 0.7; }
+    .msg-input { direction: rtl; text-align: right; font-size: 18px; }
 
-    .msg-input {
-      direction: rtl;
-      text-align: right;
-      font-size: 18px;
-      padding: 12px 16px;
-    }
-
-    .error-msg {
-      color: #ff4444;
-      font-size: 13px;
-      display: none;
-    }
+    .error-msg { color: #ff4444; font-size: 13px; display: none; }
     .error-msg.visible { display: block; }
 
     .btn-primary {
@@ -176,7 +122,6 @@
       font-size: clamp(24px, 5.5vw, 40px);
       font-weight: 800;
       cursor: pointer;
-      letter-spacing: 0.01em;
       line-height: 1.3;
       padding: 12px 16px;
       width: 100%;
@@ -184,16 +129,12 @@
       transition: filter 0.1s, transform 0.1s;
       text-shadow: 0 1px 4px rgba(0,0,0,0.4);
     }
-    .emergency-btn:active {
-      filter: brightness(0.85);
-      transform: scale(0.98);
-    }
+    .emergency-btn:active { filter: brightness(0.85); transform: scale(0.98); }
 
-    #btn-safe    { background: #1a5c2a; }
-    #btn-side    { background: #b85500; }
-    #btn-help    { background: #8b0000; }
+    #btn-safe { background: #1a5c2a; }
+    #btn-side { background: #b85500; }
+    #btn-help { background: #8b0000; }
 
-    /* ⚙️ settings trigger */
     #settings-trigger {
       position: fixed;
       bottom: max(env(safe-area-inset-bottom, 10px), 14px);
@@ -228,50 +169,50 @@
     }
     #toast.show { opacity: 1; }
 
-    /* ── Settings field groups ── */
-    .field-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
+    .field-group { display: flex; flex-direction: column; gap: 6px; }
 
     .color-dot {
       display: inline-block;
-      width: 12px;
-      height: 12px;
+      width: 12px; height: 12px;
       border-radius: 50%;
       margin-left: 6px;
       vertical-align: middle;
     }
 
-    .divider {
-      height: 1px;
-      background: #222;
-    }
+    .divider { height: 1px; background: #222; }
+
+    .phone-hint { font-size: 12px; color: #555; margin-top: 2px; }
   </style>
 </head>
 <body>
 
   <!-- Toast -->
-  <div id="toast">ווטסאפ נפתח עם ההודעה — בחר קבוצה ולחץ שלח</div>
+  <div id="toast">ווטסאפ נפתח לכל הנמענים — שלח את ההודעה</div>
 
-  <!-- Setup Screen (optional first-run) -->
+  <!-- Setup Screen -->
   <div id="setup-screen" class="screen form-screen">
     <h1>הגדרת אפליקציית החירום</h1>
     <div class="instruction">
-      לחיצה על כפתור <strong>תפתח את ווטסאפ עם ההודעה מוקלדת</strong> — תצטרך רק לבחור את הקבוצה ולשלוח.<br><br>
-      אפשר גם לשמור קישור ישיר לקבוצה כדי לפתוח אותה מהר יותר. זה לא חובה.
+      לחיצה על כפתור <strong>תפתח ווטסאפ לכל אנשי הקשר</strong> שתגדיר כאן, עם ההודעה מוקלדת מראש.<br><br>
+      הוסף לפחות מספר אחד. אפשר עד 3 נמענים.
+    </div>
+
+    <div class="field-group">
+      <label for="setup-phone1">📞 מספר 1 <span style="color:#cc0000">*</span></label>
+      <input type="text" id="setup-phone1" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
     </div>
     <div class="field-group">
-      <label for="setup-link">קישור לקבוצה (לא חובה)</label>
-      <div class="input-row">
-        <input type="text" id="setup-link" placeholder="https://chat.whatsapp.com/..." autocomplete="off" autocorrect="off" spellcheck="false">
-        <button class="btn-paste" id="setup-paste" type="button">הדבק</button>
-      </div>
-      <span class="error-msg" id="setup-error">הקישור אינו תקין. ודא שהוא מתחיל ב־ https://chat.whatsapp.com/</span>
+      <label for="setup-phone2">📞 מספר 2 <span style="color:#555">(לא חובה)</span></label>
+      <input type="text" id="setup-phone2" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
     </div>
+    <div class="field-group">
+      <label for="setup-phone3">📞 מספר 3 <span style="color:#555">(לא חובה)</span></label>
+      <input type="text" id="setup-phone3" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
+      <span class="phone-hint">פורמט: 050-1234567 או +972-50-1234567</span>
+    </div>
+
+    <span class="error-msg" id="setup-error">יש להזין לפחות מספר טלפון אחד תקין</span>
     <button class="btn-primary" id="setup-save">שמור והתחל</button>
-    <button class="btn-back" id="setup-skip" style="align-self:center;margin-top:4px">דלג — התחל בלי קישור</button>
   </div>
 
   <!-- Main Screen -->
@@ -279,7 +220,6 @@
     <button class="emergency-btn" id="btn-safe">אני במרחב מוגן 🟢</button>
     <button class="emergency-btn" id="btn-side">בדרך — נשכבתי בצד 🟡</button>
     <button class="emergency-btn" id="btn-help">צריך עזרה! 🔴</button>
-    <button id="open-group-btn" style="display:none;position:fixed;bottom:max(env(safe-area-inset-bottom,10px),14px);right:52px;background:transparent;border:none;font-size:13px;color:#555;cursor:pointer;padding:8px;-webkit-tap-highlight-color:transparent;" aria-label="פתח קבוצה">📲 קבוצה</button>
     <button id="settings-trigger" aria-label="הגדרות">⚙️</button>
   </div>
 
@@ -289,13 +229,18 @@
     <h1>הגדרות</h1>
 
     <div class="field-group">
-      <label for="settings-link">קישור לקבוצת ווטסאפ</label>
-      <div class="input-row">
-        <input type="text" id="settings-link" placeholder="https://chat.whatsapp.com/..." autocomplete="off" autocorrect="off" spellcheck="false">
-        <button class="btn-paste" id="settings-paste" type="button">הדבק</button>
-      </div>
-      <span class="error-msg" id="settings-error">הקישור אינו תקין. ודא שהוא מתחיל ב־ https://chat.whatsapp.com/</span>
+      <label for="s-phone1">📞 מספר 1 <span style="color:#cc0000">*</span></label>
+      <input type="text" id="s-phone1" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
     </div>
+    <div class="field-group">
+      <label for="s-phone2">📞 מספר 2 <span style="color:#555">(לא חובה)</span></label>
+      <input type="text" id="s-phone2" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
+    </div>
+    <div class="field-group">
+      <label for="s-phone3">📞 מספר 3 <span style="color:#555">(לא חובה)</span></label>
+      <input type="text" id="s-phone3" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
+    </div>
+    <span class="error-msg" id="settings-phone-error">יש להזין לפחות מספר טלפון אחד תקין</span>
 
     <div class="divider"></div>
 
@@ -331,22 +276,15 @@
   </div>
 
   <script>
-    // ── Constants & defaults ──────────────────────────────────────────
     const DEFAULTS = {
       msg_1: 'אני במרחב מוגן 🟢',
       msg_2: 'בדרך — נשכבתי בצד 🟡',
       msg_3: 'צריך עזרה! 🔴'
     };
 
-    // ── Helpers ───────────────────────────────────────────────────────
-    function get(key) { return localStorage.getItem(key); }
+    function get(key) { return localStorage.getItem(key) || ''; }
     function set(key, val) { localStorage.setItem(key, val); }
-
     function msg(n) { return get('msg_' + n) || DEFAULTS['msg_' + n]; }
-
-    function validateLink(val) {
-      return val.trim().startsWith('https://chat.whatsapp.com/');
-    }
 
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -358,122 +296,118 @@
       const t = document.getElementById('toast');
       t.classList.add('show');
       if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), 3000);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
     }
 
-    // ── Button text sync ──────────────────────────────────────────────
+    // ── Phone helpers ─────────────────────────────────────────────────
+    function normalizePhone(raw) {
+      let d = raw.replace(/\D/g, '');           // digits only
+      if (d.startsWith('972')) return d;         // already international
+      if (d.startsWith('0')) return '972' + d.slice(1); // 05x → 9725x
+      return d;
+    }
+
+    function isValidPhone(raw) {
+      const d = raw.replace(/\D/g, '');
+      return d.length >= 9 && d.length <= 15;
+    }
+
+    // ── Button labels ─────────────────────────────────────────────────
     function syncButtonLabels() {
       document.getElementById('btn-safe').textContent = msg(1);
       document.getElementById('btn-side').textContent = msg(2);
       document.getElementById('btn-help').textContent = msg(3);
-      // Show/hide the "open group" quick button
-      const groupBtn = document.getElementById('open-group-btn');
-      if (groupBtn) groupBtn.style.display = get('wa_link') ? 'block' : 'none';
     }
 
-    // ── Emergency button handler ──────────────────────────────────────
+    // ── Emergency handler ─────────────────────────────────────────────
     function handleEmergency(msgText) {
-      const encoded = encodeURIComponent(msgText);
-      // Official WhatsApp share URL — opens app with text pre-filled, user picks group → Send
-      const waUrl = 'https://api.whatsapp.com/send?text=' + encoded;
-      window.open(waUrl, '_blank');
-      showToast();
-    }
+      const phones = [get('phone_1'), get('phone_2'), get('phone_3')].filter(Boolean);
+      if (!phones.length) return;
 
-    function fallbackCopy(text) {
-      const ta = document.createElement('textarea');
-      ta.value = text;
-      ta.style.cssText = 'position:fixed;opacity:0;top:0;left:0';
-      document.body.appendChild(ta);
-      ta.focus();
-      ta.select();
-      try { document.execCommand('copy'); } catch (_) {}
-      document.body.removeChild(ta);
+      const encoded = encodeURIComponent(msgText);
+
+      // Open first tab immediately (within the click handler to avoid popup blocker)
+      window.open(
+        'https://api.whatsapp.com/send?phone=' + normalizePhone(phones[0]) + '&text=' + encoded,
+        '_blank'
+      );
+
+      // Open remaining tabs with slight delay
+      phones.slice(1).forEach((phone, i) => {
+        setTimeout(() => {
+          window.open(
+            'https://api.whatsapp.com/send?phone=' + normalizePhone(phone) + '&text=' + encoded,
+            '_blank'
+          );
+        }, (i + 1) * 600);
+      });
+
+      showToast();
     }
 
     // ── Setup screen ──────────────────────────────────────────────────
     document.getElementById('setup-save').addEventListener('click', () => {
-      const val = document.getElementById('setup-link').value.trim();
+      const p1 = document.getElementById('setup-phone1').value.trim();
+      const p2 = document.getElementById('setup-phone2').value.trim();
+      const p3 = document.getElementById('setup-phone3').value.trim();
       const err = document.getElementById('setup-error');
-      if (!validateLink(val)) {
+
+      if (!p1 || !isValidPhone(p1)) {
         err.classList.add('visible');
         return;
       }
       err.classList.remove('visible');
-      set('wa_link', val);
+
+      set('phone_1', p1);
+      if (p2 && isValidPhone(p2)) set('phone_2', p2); else localStorage.removeItem('phone_2');
+      if (p3 && isValidPhone(p3)) set('phone_3', p3); else localStorage.removeItem('phone_3');
       set('wa_seen', '1');
+
       syncButtonLabels();
       showScreen('main-screen');
     });
 
-    document.getElementById('setup-link').addEventListener('input', () => {
-      document.getElementById('setup-error').classList.remove('visible');
-    });
-
-    document.getElementById('setup-paste').addEventListener('click', () => {
-      navigator.clipboard.readText().then(text => {
-        document.getElementById('setup-link').value = text.trim();
+    ['setup-phone1', 'setup-phone2', 'setup-phone3'].forEach(id => {
+      document.getElementById(id).addEventListener('input', () => {
         document.getElementById('setup-error').classList.remove('visible');
-      }).catch(() => {});
+      });
     });
 
     // ── Main screen buttons ───────────────────────────────────────────
     [1, 2, 3].forEach(n => {
       const ids = ['btn-safe', 'btn-side', 'btn-help'];
-      document.getElementById(ids[n - 1]).addEventListener('click', () => {
-        handleEmergency(msg(n));
-      });
+      document.getElementById(ids[n - 1]).addEventListener('click', () => handleEmergency(msg(n)));
     });
 
     document.getElementById('settings-trigger').addEventListener('click', () => {
-      // Pre-fill settings fields
-      document.getElementById('settings-link').value = get('wa_link') || '';
+      document.getElementById('s-phone1').value = get('phone_1');
+      document.getElementById('s-phone2').value = get('phone_2');
+      document.getElementById('s-phone3').value = get('phone_3');
       document.getElementById('settings-msg1').value = msg(1);
       document.getElementById('settings-msg2').value = msg(2);
       document.getElementById('settings-msg3').value = msg(3);
-      document.getElementById('settings-error').classList.remove('visible');
+      document.getElementById('settings-phone-error').classList.remove('visible');
       showScreen('settings-screen');
     });
 
     // ── Settings screen ───────────────────────────────────────────────
-    document.getElementById('settings-back').addEventListener('click', () => {
-      showScreen('main-screen');
-    });
-
-    // ── Mobile QR screen ──────────────────────────────────────────────
-    function showMobileScreen() {
-      const url = window.location.origin + window.location.pathname;
-      document.getElementById('qr-img').src =
-        'https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=000000&bgcolor=ffffff&data=' +
-        encodeURIComponent(url);
-      document.getElementById('qr-url').textContent = url;
-      showScreen('mobile-screen');
-    }
-    document.getElementById('open-mobile-btn').addEventListener('click', showMobileScreen);
-    document.getElementById('mobile-back').addEventListener('click', () => {
-      showScreen('settings-screen');
-    });
-
-    document.getElementById('settings-link').addEventListener('input', () => {
-      document.getElementById('settings-error').classList.remove('visible');
-    });
-
-    document.getElementById('settings-paste').addEventListener('click', () => {
-      navigator.clipboard.readText().then(text => {
-        document.getElementById('settings-link').value = text.trim();
-        document.getElementById('settings-error').classList.remove('visible');
-      }).catch(() => {});
-    });
+    document.getElementById('settings-back').addEventListener('click', () => showScreen('main-screen'));
 
     document.getElementById('settings-save').addEventListener('click', () => {
-      const linkVal = document.getElementById('settings-link').value.trim();
-      const err = document.getElementById('settings-error');
-      if (!validateLink(linkVal)) {
+      const p1 = document.getElementById('s-phone1').value.trim();
+      const p2 = document.getElementById('s-phone2').value.trim();
+      const p3 = document.getElementById('s-phone3').value.trim();
+      const err = document.getElementById('settings-phone-error');
+
+      if (!p1 || !isValidPhone(p1)) {
         err.classList.add('visible');
         return;
       }
       err.classList.remove('visible');
-      set('wa_link', linkVal);
+
+      set('phone_1', p1);
+      if (p2 && isValidPhone(p2)) set('phone_2', p2); else localStorage.removeItem('phone_2');
+      if (p3 && isValidPhone(p3)) set('phone_3', p3); else localStorage.removeItem('phone_3');
 
       const m1 = document.getElementById('settings-msg1').value.trim();
       const m2 = document.getElementById('settings-msg2').value.trim();
@@ -486,24 +420,21 @@
       showScreen('main-screen');
     });
 
-    // ── Open-group quick button ───────────────────────────────────────
-    document.getElementById('open-group-btn').addEventListener('click', () => {
-      const link = get('wa_link');
-      if (link) window.open(link, '_blank');
+    // ── Mobile QR screen ──────────────────────────────────────────────
+    document.getElementById('open-mobile-btn').addEventListener('click', () => {
+      const url = window.location.origin + window.location.pathname;
+      document.getElementById('qr-img').src =
+        'https://api.qrserver.com/v1/create-qr-code/?size=250x250&color=000000&bgcolor=ffffff&data=' +
+        encodeURIComponent(url);
+      document.getElementById('qr-url').textContent = url;
+      showScreen('mobile-screen');
     });
-
-    // ── Setup: skip ───────────────────────────────────────────────────
-    document.getElementById('setup-skip').addEventListener('click', () => {
-      set('wa_seen', '1');
-      syncButtonLabels();
-      showScreen('main-screen');
-    });
+    document.getElementById('mobile-back').addEventListener('click', () => showScreen('settings-screen'));
 
     // ── Boot ──────────────────────────────────────────────────────────
     function boot() {
       syncButtonLabels();
-      // Show setup only on very first launch (no link and never seen setup)
-      if (!get('wa_link') && !get('wa_seen')) {
+      if (!get('phone_1') && !get('wa_seen')) {
         showScreen('setup-screen');
       } else {
         showScreen('main-screen');
@@ -512,7 +443,6 @@
 
     boot();
 
-    // ── Service Worker ────────────────────────────────────────────────
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
     }
