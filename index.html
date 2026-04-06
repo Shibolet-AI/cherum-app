@@ -333,9 +333,12 @@
       if (!target) return;
       const encoded = encodeURIComponent(msgText);
       if (isLink(target)) {
-        copyToClipboard(msgText).catch(() => {});
-        window.open(target, '_blank');
-        showToast('הועתק ✓ — הדבק בווטסאפ ושלח:\n' + msgText, 6000);
+        // open WhatsApp with text pre-filled; user just taps the group
+        window.open(
+          'https://api.whatsapp.com/send?text=' + encoded,
+          '_blank'
+        );
+        showToast('בחר את הקבוצה ושלח');
       } else {
         window.open(
           'https://api.whatsapp.com/send?phone=' + normalizePhone(target) + '&text=' + encoded,
