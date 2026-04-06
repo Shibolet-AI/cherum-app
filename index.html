@@ -187,27 +187,18 @@
 <body>
 
   <!-- Toast -->
-  <div id="toast">ווטסאפ נפתח לכל הנמענים — שלח את ההודעה</div>
+  <div id="toast">ווטסאפ נפתח — שלח את ההודעה</div>
 
   <!-- Setup Screen -->
   <div id="setup-screen" class="screen form-screen">
     <h1>הגדרת אפליקציית החירום</h1>
     <div class="instruction">
-      לחיצה על כפתור <strong>תפתח ווטסאפ לכל אנשי הקשר</strong> שתגדיר כאן, עם ההודעה מוקלדת מראש.<br><br>
-      הוסף לפחות מספר אחד. אפשר עד 3 נמענים.
+      לחיצה על כפתור <strong>תפתח ווטסאפ עם ההודעה מוקלדת</strong> למספר שתגדיר כאן.
     </div>
 
     <div class="field-group">
-      <label for="setup-phone1">📞 מספר 1 <span style="color:#cc0000">*</span></label>
+      <label for="setup-phone1">📞 מספר טלפון</label>
       <input type="text" id="setup-phone1" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
-    </div>
-    <div class="field-group">
-      <label for="setup-phone2">📞 מספר 2 <span style="color:#555">(לא חובה)</span></label>
-      <input type="text" id="setup-phone2" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
-    </div>
-    <div class="field-group">
-      <label for="setup-phone3">📞 מספר 3 <span style="color:#555">(לא חובה)</span></label>
-      <input type="text" id="setup-phone3" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
       <span class="phone-hint">פורמט: 050-1234567 או +972-50-1234567</span>
     </div>
 
@@ -229,18 +220,10 @@
     <h1>הגדרות</h1>
 
     <div class="field-group">
-      <label for="s-phone1">📞 מספר 1 <span style="color:#cc0000">*</span></label>
+      <label for="s-phone1">📞 מספר טלפון</label>
       <input type="text" id="s-phone1" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
     </div>
-    <div class="field-group">
-      <label for="s-phone2">📞 מספר 2 <span style="color:#555">(לא חובה)</span></label>
-      <input type="text" id="s-phone2" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
-    </div>
-    <div class="field-group">
-      <label for="s-phone3">📞 מספר 3 <span style="color:#555">(לא חובה)</span></label>
-      <input type="text" id="s-phone3" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
-    </div>
-    <span class="error-msg" id="settings-phone-error">יש להזין לפחות מספר טלפון אחד תקין</span>
+    <span class="error-msg" id="settings-phone-error">יש להזין מספר טלפון תקין</span>
 
     <div class="divider"></div>
 
@@ -321,35 +304,19 @@
 
     // ── Emergency handler ─────────────────────────────────────────────
     function handleEmergency(msgText) {
-      const phones = [get('phone_1'), get('phone_2'), get('phone_3')].filter(Boolean);
-      if (!phones.length) return;
-
+      const phone = get('phone_1');
+      if (!phone) return;
       const encoded = encodeURIComponent(msgText);
-
-      // Open first tab immediately (within the click handler to avoid popup blocker)
       window.open(
-        'https://api.whatsapp.com/send?phone=' + normalizePhone(phones[0]) + '&text=' + encoded,
+        'https://api.whatsapp.com/send?phone=' + normalizePhone(phone) + '&text=' + encoded,
         '_blank'
       );
-
-      // Open remaining tabs with slight delay
-      phones.slice(1).forEach((phone, i) => {
-        setTimeout(() => {
-          window.open(
-            'https://api.whatsapp.com/send?phone=' + normalizePhone(phone) + '&text=' + encoded,
-            '_blank'
-          );
-        }, (i + 1) * 600);
-      });
-
       showToast();
     }
 
     // ── Setup screen ──────────────────────────────────────────────────
     document.getElementById('setup-save').addEventListener('click', () => {
       const p1 = document.getElementById('setup-phone1').value.trim();
-      const p2 = document.getElementById('setup-phone2').value.trim();
-      const p3 = document.getElementById('setup-phone3').value.trim();
       const err = document.getElementById('setup-error');
 
       if (!p1 || !isValidPhone(p1)) {
@@ -359,18 +326,14 @@
       err.classList.remove('visible');
 
       set('phone_1', p1);
-      if (p2 && isValidPhone(p2)) set('phone_2', p2); else localStorage.removeItem('phone_2');
-      if (p3 && isValidPhone(p3)) set('phone_3', p3); else localStorage.removeItem('phone_3');
       set('wa_seen', '1');
 
       syncButtonLabels();
       showScreen('main-screen');
     });
 
-    ['setup-phone1', 'setup-phone2', 'setup-phone3'].forEach(id => {
-      document.getElementById(id).addEventListener('input', () => {
-        document.getElementById('setup-error').classList.remove('visible');
-      });
+    document.getElementById('setup-phone1').addEventListener('input', () => {
+      document.getElementById('setup-error').classList.remove('visible');
     });
 
     // ── Main screen buttons ───────────────────────────────────────────
@@ -381,8 +344,6 @@
 
     document.getElementById('settings-trigger').addEventListener('click', () => {
       document.getElementById('s-phone1').value = get('phone_1');
-      document.getElementById('s-phone2').value = get('phone_2');
-      document.getElementById('s-phone3').value = get('phone_3');
       document.getElementById('settings-msg1').value = msg(1);
       document.getElementById('settings-msg2').value = msg(2);
       document.getElementById('settings-msg3').value = msg(3);
@@ -395,8 +356,6 @@
 
     document.getElementById('settings-save').addEventListener('click', () => {
       const p1 = document.getElementById('s-phone1').value.trim();
-      const p2 = document.getElementById('s-phone2').value.trim();
-      const p3 = document.getElementById('s-phone3').value.trim();
       const err = document.getElementById('settings-phone-error');
 
       if (!p1 || !isValidPhone(p1)) {
@@ -406,8 +365,6 @@
       err.classList.remove('visible');
 
       set('phone_1', p1);
-      if (p2 && isValidPhone(p2)) set('phone_2', p2); else localStorage.removeItem('phone_2');
-      if (p3 && isValidPhone(p3)) set('phone_3', p3); else localStorage.removeItem('phone_3');
 
       const m1 = document.getElementById('settings-msg1').value.trim();
       const m2 = document.getElementById('settings-msg2').value.trim();
