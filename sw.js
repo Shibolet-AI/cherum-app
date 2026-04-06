@@ -1,4 +1,4 @@
-const CACHE = 'cherum-v1';
+const CACHE = 'cherum-v2';
 const PRECACHE = ['./index.html', './manifest.json', './sw.js'];
 
 self.addEventListener('install', e => {
