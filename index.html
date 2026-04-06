@@ -347,27 +347,22 @@
       }
     }
 
-    function handleEmergency(msgText) {
-      const target = get('phone_1');
-      if (!target) return;
+    // ── Background location watch ─────────────────────────────────────
+    let lastLocation = null;
 
-      if (!navigator.geolocation) {
-        sendWhatsApp(msgText, null);
-        return;
-      }
-
-      showToast('מאתר מיקום…');
-      navigator.geolocation.getCurrentPosition(
+    function startLocationWatch() {
+      if (!navigator.geolocation) return;
+      navigator.geolocation.watchPosition(
         pos => {
-          const loc = pos.coords.latitude.toFixed(6) + ',' + pos.coords.longitude.toFixed(6);
-          sendWhatsApp(msgText, loc);
+          lastLocation = pos.coords.latitude.toFixed(6) + ',' + pos.coords.longitude.toFixed(6);
         },
-        () => {
-          // permission denied or timeout — send without location
-          sendWhatsApp(msgText, null);
-        },
-        { timeout: 8000, maximumAge: 30000 }
+        () => { lastLocation = null; },
+        { enableHighAccuracy: true, maximumAge: 30000 }
       );
+    }
+
+    function handleEmergency(msgText) {
+      sendWhatsApp(msgText, lastLocation);
     }
 
     // ── Setup screen ──────────────────────────────────────────────────
@@ -455,6 +450,7 @@
     }
 
     boot();
+    startLocationWatch();
 
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js').catch(() => {});
