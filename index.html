@@ -187,22 +187,23 @@
 <body>
 
   <!-- Toast -->
-  <div id="toast">ווטסאפ נפתח — שלח את ההודעה</div>
+  <div id="toast"></div>
 
   <!-- Setup Screen -->
   <div id="setup-screen" class="screen form-screen">
     <h1>הגדרת אפליקציית החירום</h1>
     <div class="instruction">
-      לחיצה על כפתור <strong>תפתח ווטסאפ עם ההודעה מוקלדת</strong> למספר שתגדיר כאן.
+      לחיצה על כפתור <strong>תפתח ווטסאפ עם ההודעה מוקלדת</strong>.<br>
+      הכנס מספר טלפון <strong>או</strong> קישור לקבוצת ווטסאפ.
     </div>
 
     <div class="field-group">
-      <label for="setup-phone1">📞 מספר טלפון</label>
-      <input type="text" id="setup-phone1" placeholder="050-1234567" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
-      <span class="phone-hint">פורמט: 050-1234567 או +972-50-1234567</span>
+      <label for="setup-phone1">📞 מספר טלפון / 👥 קישור לקבוצה</label>
+      <input type="text" id="setup-phone1" placeholder="050-1234567 או https://chat.whatsapp.com/..." autocomplete="off" autocorrect="off" spellcheck="false">
+      <span class="phone-hint">מספר: 050-1234567 | קישור: הדבק קישור של קבוצת ווטסאפ</span>
     </div>
 
-    <span class="error-msg" id="setup-error">יש להזין לפחות מספר טלפון אחד תקין</span>
+    <span class="error-msg" id="setup-error">יש להזין מספר טלפון תקין או קישור לקבוצה</span>
     <button class="btn-primary" id="setup-save">שמור והתחל</button>
   </div>
 
@@ -220,10 +221,10 @@
     <h1>הגדרות</h1>
 
     <div class="field-group">
-      <label for="s-phone1">📞 מספר טלפון</label>
-      <input type="text" id="s-phone1" inputmode="tel" autocomplete="tel" autocorrect="off" spellcheck="false">
+      <label for="s-phone1">📞 מספר טלפון / 👥 קישור לקבוצה</label>
+      <input type="text" id="s-phone1" autocomplete="off" autocorrect="off" spellcheck="false">
     </div>
-    <span class="error-msg" id="settings-phone-error">יש להזין מספר טלפון תקין</span>
+    <span class="error-msg" id="settings-phone-error">יש להזין מספר טלפון תקין או קישור לקבוצה</span>
 
     <div class="divider"></div>
 
@@ -275,24 +276,24 @@
     }
 
     let toastTimer = null;
-    function showToast() {
-      const t = document.getElementById('toast');
-      t.classList.add('show');
-      if (toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
-    }
 
-    // ── Phone helpers ─────────────────────────────────────────────────
+    // ── Target helpers ────────────────────────────────────────────────
+    function isLink(raw) { return /^https?:\/\//i.test(raw.trim()); }
+
     function normalizePhone(raw) {
-      let d = raw.replace(/\D/g, '');           // digits only
-      if (d.startsWith('972')) return d;         // already international
-      if (d.startsWith('0')) return '972' + d.slice(1); // 05x → 9725x
+      let d = raw.replace(/\D/g, '');
+      if (d.startsWith('972')) return d;
+      if (d.startsWith('0')) return '972' + d.slice(1);
       return d;
     }
 
     function isValidPhone(raw) {
       const d = raw.replace(/\D/g, '');
       return d.length >= 9 && d.length <= 15;
+    }
+
+    function isValidTarget(raw) {
+      return isLink(raw) || isValidPhone(raw);
     }
 
     // ── Button labels ─────────────────────────────────────────────────
@@ -303,15 +304,29 @@
     }
 
     // ── Emergency handler ─────────────────────────────────────────────
+    function showToast(text) {
+      const t = document.getElementById('toast');
+      t.textContent = text;
+      t.classList.add('show');
+      if (toastTimer) clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => t.classList.remove('show'), 3500);
+    }
+
     function handleEmergency(msgText) {
-      const phone = get('phone_1');
-      if (!phone) return;
+      const target = get('phone_1');
+      if (!target) return;
       const encoded = encodeURIComponent(msgText);
-      window.open(
-        'https://api.whatsapp.com/send?phone=' + normalizePhone(phone) + '&text=' + encoded,
-        '_blank'
-      );
-      showToast();
+      if (isLink(target)) {
+        navigator.clipboard.writeText(msgText).catch(() => {});
+        window.open(target, '_blank');
+        showToast('ההודעה הועתקה — הדבק בווטסאפ ושלח');
+      } else {
+        window.open(
+          'https://api.whatsapp.com/send?phone=' + normalizePhone(target) + '&text=' + encoded,
+          '_blank'
+        );
+        showToast('ווטסאפ נפתח — שלח את ההודעה');
+      }
     }
 
     // ── Setup screen ──────────────────────────────────────────────────
@@ -319,7 +334,7 @@
       const p1 = document.getElementById('setup-phone1').value.trim();
       const err = document.getElementById('setup-error');
 
-      if (!p1 || !isValidPhone(p1)) {
+      if (!p1 || !isValidTarget(p1)) {
         err.classList.add('visible');
         return;
       }
@@ -358,7 +373,7 @@
       const p1 = document.getElementById('s-phone1').value.trim();
       const err = document.getElementById('settings-phone-error');
 
-      if (!p1 || !isValidPhone(p1)) {
+      if (!p1 || !isValidTarget(p1)) {
         err.classList.add('visible');
         return;
       }
